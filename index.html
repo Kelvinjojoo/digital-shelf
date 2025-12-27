@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Digital Shelf</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: 'Minecraft';
+            src: url('https://fonts.cdnfonts.com/s/14897/Minecraft.woff') format('woff');
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Minecraft', sans-serif;
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .shelf-container {
+            position: relative;
+            width: 100vw;
+            height: calc(100vw * 1.777);
+            max-width: 500px;
+            max-height: calc(500px * 1.777);
+            background-image: url('/images/latar-20belakang.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        .name-tag {
+            position: absolute;
+            top: -18px; 
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 1px 6px;
+            border-radius: 1px;
+            font-size: 7px; 
+            white-space: nowrap;
+            pointer-events: none;
+            border: 1px solid #111;
+            z-index: 10;
+        }
+
+        .character-tag {
+            font-size: 13px;
+            padding: 3px 10px;
+            top: -30px;
+        }
+
+        .item-link {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            z-index: 5;
+            text-decoration: none;
+        }
+
+        .item-link.clicked {
+            transform: translate(-50%, -100%) scale(1.1) !important;
+            z-index: 50;
+        }
+
+        .character.clicked {
+            transform: translate(-50%, -10%) scale(1.05) !important;
+            z-index: 50;
+        }
+
+        .item-img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.3));
+        }
+
+        #music-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #8b4513;
+            border: 3px solid #5d2e0a;
+            color: #f4e4bc;
+            box-shadow: 2px 2px 0px #3d1e07, inset 2px 2px 0px #a0522d;
+            padding: 4px;
+            border-radius: 4px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        /* Add overlay for first interaction */
+        #music-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-family: 'Minecraft', sans-serif;
+        }
+
+        .start-button {
+            background: #8b4513;
+            border: 3px solid #5d2e0a;
+            color: #f4e4bc;
+            padding: 15px 30px;
+            font-size: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-family: 'Minecraft', sans-serif;
+            box-shadow: 3px 3px 0px #3d1e07, inset 2px 2px 0px #a0522d;
+        }
+
+        .start-button:hover {
+            background: #a0522d;
+        }
+
+        .shelf-item { 
+            width: 11%; 
+            height: auto; 
+            transform: translate(-50%, -100%); 
+        }
+        .character { 
+            width: 44%; 
+            height: auto; 
+            transform: translate(-50%, -10%);
+        }
+
+        .pos-1-1 { top: 45.5%; left: 29%; }
+        .pos-1-2 { top: 45.5%; left: 43%; }
+        .pos-1-3 { top: 41.5%; left: 56%; }
+        .pos-1-4 { top: 41.5%; left: 66%; }
+
+        .pos-2-1 { top: 54.5%; left: 34%; }
+        .pos-2-2 { top: 54.5%; left: 44%; }
+        .pos-2-3 { top: 54.5%; left: 56%; }
+        .pos-2-4 { top: 54.5%; left: 66%; }
+
+        .pos-3-1 { top: 67.5%; left: 34%; }
+        .pos-3-2 { top: 67.5%; left: 44%; }
+        .pos-3-3 { top: 67.5%; left: 56%; }
+        .pos-3-4 { top: 69.8%; left: 66%; }
+
+        .char-left { bottom: 1%; left: 18%; }
+        .char-right { bottom: 1%; left: 82%; }
+    </style>
+</head>
+<body>
+
+    <div class="shelf-container" id="container">
+        <!-- Music Toggle Button -->
+        <div id="music-toggle" onclick="toggleMusic(event)">
+            <span id="music-icon">🔇</span>
+        </div>
+
+        <!-- Music Overlay (shown before first interaction) -->
+        <div id="music-overlay">
+            <h2 style="font-size: 24px; margin-bottom: 20px;">Welcome to My Digital Shelf</h2>
+            <p style="font-size: 16px; margin-bottom: 30px;">Click the button below to start with music enabled</p>
+            <button class="start-button" onclick="startMusic()">Start with Music 🔊</button>
+            <button class="start-button" onclick="startWithoutMusic()" style="margin-top: 10px; background: #555;">Start Without Music 🔇</button>
+        </div>
+
+        <!-- Shelf Row 1 -->
+        <a href="https://example.com/1" class="item-link shelf-item pos-1-1" onclick="handleItemClick(event, this)">
+            <div class="name-tag">Controller</div>
+            <img src="images/coin.png" alt="Item" class="item-img">
+        </a>
+        <a href="https://example.com/2" class="item-link shelf-item pos-1-2" onclick="handleItemClick(event, this)">
+            <div class="name-tag">Power Up</div>
+            <img src="images/calender.png" alt="Item" class="item-img">
+        </a>
+
+        <!-- Floor Characters -->
+        <a href="https://example.com/dev" class="item-link character char-left" onclick="handleItemClick(event, this)">
+            <div class="name-tag character-tag">The Dev</div>
+            <img src="/images/person-laptop.png" alt="Laptop Char" class="item-img">
+        </a>
+        <a href="https://example.com/photo" class="item-link character char-right" onclick="handleItemClick(event, this)">
+            <div class="name-tag character-tag">The Photographer</div>
+            <img src="/images/person-camera.png" alt="Camera Char" class="item-img">
+        </a>
+
+        <!-- Background Music -->
+        <audio id="bg-music" loop>
+            <source src="song.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <script>
+        const music = document.getElementById('bg-music');
+        const icon = document.getElementById('music-icon');
+        const overlay = document.getElementById('music-overlay');
+        let isPlaying = false;
+        let musicInitialized = false;
+
+        // Function to start music with user interaction
+        function startMusic() {
+            overlay.style.display = 'none';
+            musicInitialized = true;
+            music.play().then(() => {
+                isPlaying = true;
+                icon.textContent = '🔊';
+                console.log("[v0] Music started successfully");
+            }).catch(e => {
+                console.log("[v0] Music playback failed:", e);
+                icon.textContent = '🔇';
+                isPlaying = false;
+            });
+        }
+
+        // Function to start without music
+        function startWithoutMusic() {
+            overlay.style.display = 'none';
+            musicInitialized = true;
+            isPlaying = false;
+            icon.textContent = '🔇';
+        }
+
+        // Toggle music function
+        function toggleMusic(event) {
+            if (event) event.stopPropagation();
+            
+            // If music hasn't been initialized yet, initialize it first
+            if (!musicInitialized) {
+                musicInitialized = true;
+                overlay.style.display = 'none';
+            }
+            
+            if (isPlaying) {
+                music.pause();
+                icon.textContent = '🔇';
+            } else {
+                music.play().then(() => {
+                    icon.textContent = '🔊';
+                }).catch(e => {
+                    console.log("[v0] Music playback failed:", e);
+                    icon.textContent = '🔇';
+                });
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function handleItemClick(event, element) {
+            event.preventDefault();
+            
+            // If music hasn't been initialized yet, show overlay
+            if (!musicInitialized) {
+                overlay.style.display = 'flex';
+                return;
+            }
+            
+            const url = element.getAttribute('href');
+            const img = element.querySelector('.item-img');
+            
+            const originalSrc = img.src;
+            if (originalSrc.includes('.png') && !originalSrc.includes('-ver2.png')) {
+                img.src = originalSrc.replace('.png', '-ver2.png');
+            } else if (originalSrc.includes('.jpeg') && !originalSrc.includes('-ver2.jpeg')) {
+                img.src = originalSrc.replace('.jpeg', '-ver2.jpeg');
+            }
+            
+            element.classList.add('clicked');
+            
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500);
+        }
+
+        function handleResize() {
+            const container = document.getElementById('container');
+            const bgWidth = 1000;
+            const bgHeight = 1778;
+            const screenRatio = window.innerWidth / window.innerHeight;
+            const bgRatio = bgWidth / bgHeight;
+
+            if (screenRatio > bgRatio) {
+                container.style.width = (window.innerHeight * bgRatio) + 'px';
+                container.style.height = '100vh';
+            } else {
+                container.style.width = '100vw';
+                container.style.height = (window.innerWidth / bgRatio) + 'px';
+            }
+        }
+
+        // Initialize with music muted/off
+        icon.textContent = '🔇';
+        isPlaying = false;
+        
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    </script>
+</body>
+</html>
