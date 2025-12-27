@@ -281,7 +281,7 @@
             const url = element.getAttribute('href');
             const img = element.querySelector('.item-img');
             
-            const originalSrc = img.src;
+            const originalSrc = img.getAttribute('src');
             if (originalSrc.includes('.png') && !originalSrc.includes('-ver2.png')) {
                 img.src = originalSrc.replace('.png', '-ver2.png');
             } else if (originalSrc.includes('.jpeg') && !originalSrc.includes('-ver2.jpeg')) {
